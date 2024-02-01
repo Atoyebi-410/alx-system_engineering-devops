@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 # Bash script that will display information about subdomains
-domain () {
-if [ "$2" ];
-then
-    echo -n "The subdomain $2 is a"
-    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk '{print " " $4 " record and points to " $5}' | tail -n 1
-else
-    for i in www lb-01 web-01 web-02
-    do
-        echo -n "The subdomain $i is a"
-        dig "$i.$1" | grep -A1 'ANSWER SECTION:' | awk '{print " " $4 " record and points to " $5}' | tail -n 1
-    done
-fi
+# Information about server domains
+
+check_domain() {
+    # Check for a valid domain
+    SUBDOMAINS=("www"  "lb-01" "web-01" "web-02")
+    if [ -z "$2" ]; then
+	for i in "${SUBDOMAINS[@]}"; do
+	    dig "$i.$1" | grep -A1 'ANSWER SECTION:' | tail -n1 | awk '{split($0, SUBDOMAIN, "."); print "The subdomain " SUBDOMAIN[1] " is a " $4 " record and points to " $5}'
+	done
+    else
+	dig "$2.$1" | grep -A1 'ANSWER SECTION:' | tail -n1 | awk '{split($0, SUBDOMAIN, "."); print "The subdomain " SUBDOMAIN[1] " is a " $4 " record and points to " $5}'
+    fi
 }
-domain "$1" "$2"
+
+check_domain "$1" "$2"
