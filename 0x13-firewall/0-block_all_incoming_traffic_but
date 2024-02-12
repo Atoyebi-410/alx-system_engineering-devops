@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-# Configures firewall
 
 sudo apt-get install ufw
 sudo ufw status
